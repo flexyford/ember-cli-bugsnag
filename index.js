@@ -23,7 +23,12 @@ module.exports = {
     }
   },
 
-  config: function() {
+  config: function(env, config) {
+    const { bugsnag } = config;
+    const { notifyReleaseStages , releaseStage = env } = bugsnag;
+
+    this._includeBugsnag = this.isDevelopingAddon() || notifyReleaseStages.includes(releaseStage);
+
     return {
       bugsnag: readEnvironmentConfig(process.env)
     };
@@ -42,9 +47,6 @@ module.exports = {
   },
 
   included: function(app) {
-    this._includeBugsnag =
-      this.isDevelopingAddon() || process.env.EMBER_ENV !== 'test';
-
     this._super.included.apply(this, arguments);
 
     if (this._includeBugsnag) {
